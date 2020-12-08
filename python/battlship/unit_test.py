@@ -27,7 +27,7 @@ class TestStringMethods(unittest.TestCase):
 	# Returns True if the string contains 4 a. 
 	def test_boardfunctions(self):
 		self.maxDiff = None
-		_board = board('PlayerA')
+		_board = board('PlayerA',silent=True)
 		_boardImage = _board.printBoard(False)
 		self.assertEqual(_boardImage,boardImage)
 
@@ -113,7 +113,7 @@ class TestStringMethods(unittest.TestCase):
 	
 
 	def test_bombfunctions(self):
-		_board = board('unittest')
+		_board = board('unittest',silent=True)
 
 		#should be able to bomb 64 random cells before failing
 		for i in range(66):
@@ -123,7 +123,7 @@ class TestStringMethods(unittest.TestCase):
 				self.assertEqual(i,64)
 				break
 
-		_board = board('bombcells')
+		_board = board('bombcells',silent=True)
 		_cell = _board.bombRandomCell()
 		self.assertRaises(Exception,  _board.bombRandomCell,_cell)
 		self.assertRaises(Exception,  _board.bombRandomCell,None)
