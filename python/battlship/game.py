@@ -3,24 +3,45 @@ from player import player
 import os,sys
 import time
 
-if __name__ == '__main__':
-    autoPlay = False
-    display = False
-    for arg in sys.argv[1:]:
-        if arg == '-a':
-            autoPlay = True
-        elif arg == '-ui':
-            display = True
-    playerA = player("Kane",autoPlay) 
-    playerB = player("Able",autoPlay) 
+def getOrientationHorizontal():
+    while True:
+        orientation = input("Enter 'H' for Horizontal or 'V' for virticle ship orientation: ")
+        if len(orientation) >0 and orientation.lower()[0] == 'h':
+            return True
+            break
+        elif len(orientation) >0 and orientation.lower()[0] == 'v':
+            return False
+            break
+    
 
+if __name__ == '__main__':
+    autoPlay = True
+    display = False
+    quiet = False
+    playerA = None
+    PlayerB = None
+    for arg in sys.argv[1:]:
+        if arg == '--quiet':
+            quiet = True
+        elif arg == '--manual':
+            autoPlay = False
+    
     if autoPlay:
-        while True:
-            if playerA.go(playerB.board):
-                print(playerA.playername + " has won!!!")
-                break
-            if playerB.go(playerA.board):
-                print(playerB.playername + " has won!!!")
-                break
-            time.sleep(.2)
+        playerA = player("Kane",autoPlay)
+    else :
+        playerAName = input("Please enter your name: ")
+        playerA = player(playerAName,autoPlay,quiet)
+        shipCell = playerA.getCellToBombFromPlayer(playerA.board,"Enter the midship cell for your ship: ","")
+        playerA.board.allocShip(getOrientationHorizontal(),shipCell)
+
+    playerB = player("Able",True,quiet)
+
+    while True:
+        if playerA.go(playerB.board):
+            print(playerB.playername + ": you sank my battleship!")
+            break
+        if playerB.go(playerA.board):
+            print(playerA.playername + ": you sank my battleship!")
+            break
+        time.sleep(.2)
     print("\nGame Over\n")

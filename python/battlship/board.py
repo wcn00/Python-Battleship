@@ -9,6 +9,7 @@ class cell:
         self.col = col
         self.ship = False
         self.hit = False
+        self.parentship:ship
 
 class ship():
     def __init__(self,horizontal, bow,midships,stern ):
@@ -16,6 +17,8 @@ class ship():
         self.bow = bow
         self.midships = midships
         self.stern = stern
+        bow.ship = midships.ship = stern.ship = True
+        bow.parentship = midships.parentship = stern.parentship = self
     
     def isSunk(self):
         return self.bow.hit and self.midships.hit and self.stern.hit
@@ -74,8 +77,13 @@ class board:
         boardStr = ''
         rowStr = ''
         for r,row in enumerate(self.board):
-            for c,col in enumerate(row):
-                rowStr += col.row+':'+col.col+','
+            for c,cell in enumerate(row):
+                if cell.ship and cell.hit:
+                    rowStr += "** "
+                elif cell.hit:
+                    rowStr += "XX "
+                else:
+                    rowStr += cell.row+cell.col+' '
             rowStr = rowStr[:-1]
             if(stdout):
                 print(rowStr)
@@ -117,35 +125,39 @@ class board:
             bowCell = self.board[rowNo][colNo]
             midCell = self.board[rowNo+1][colNo]
             sternCell = self.board[rowNo-1][colNo]
-
-        bowCell.ship = midCell.ship = sternCell.ship = True
         return ship(horizontal,bowCell,midCell,sternCell)
 
     #allocate a ship in any cell.  If its on the edge walk it towards the center one cell
     def allocShip(self,horizontal,shipCell:cell):
+        col = self.getColIndex(shipCell.col);
+        row = self.getColIndex(shipCell.col);
         if horizontal == True:
-            if shipCell.col == 0:
-                shipCell.col = shipCell.col+1
-            if shipCell.col == 7:
-                shipCell.col = shipCell.col - 1
-            midCell = self.board[shipCell.row][shipCell.col]
-            bowCell = self.board[shipCell.row][shipCell.col-1]
-            sternCell = self.board[shipCell.row][shipCell.col+1]
+            col = self.getColIndex(shipCell.col);
+            if col == 0:
+                col = col+1
+            if col == 7:
+                col = col-1
+            midCell = self.board[row][col]
+            bowCell = self.board[row][col-1]
+            sternCell = self.board[row][col+1]
         else:
-            if shipCell.row == 0:
-                shipCell.row = shipCell.row + 1
-            if shipCell.row == 7:
-                shipCell.row = shipCell.row - 1 
-            midCell = self.board[shipCell.row][shipCell.col]
-            bowCell = self.board[shipCell.row-1][shipCell.col]
-            sternCell = self.board[shipCell.row+1][shipCell.col]
-            
-        bowCell.Ship = midCell.Ship = sternCell.Ship = True
+            if row == 0:
+                row=row+1
+            if row == 7:
+                row=row-1
+            midCell = self.board[row][col]
+            bowCell = self.board[row-1][col]
+            sternCell = self.board[row+1][col]
         return ship(horizontal,bowCell,midCell,sternCell)
 
+    def getColIndex(self,colLbl:str):
+        return self.colnames.index(colLbl);
+    def getRowIndex(self,rowLbl:str):
+        return self.rownames.index(rowLbl);
+    def getCellFromIndex(self,row,col):
+        return self.board[row][col]
+    def shipForCellIsSunk(self,_cell:cell):
+        return (_cell.ship and _cell.parentship.isSunk())
 
-if __name__ == '__main__':
-    boardA = board('PlayerA')
-    print(boardA.printBoard(False))
 
 

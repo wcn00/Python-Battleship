@@ -5,14 +5,32 @@ class player:
     def __init__(self,playerName,auto:bool,silent=False):
         horizontal = random.randint(0,100)%2 == 1
         self.playername = playerName
+        self.auto = auto
         self.board = board(self.playername,silent)
-        self.ship = self.board.allocRandomShip(horizontal)
         self.opponentShip = []
         self.hitState = 0
         self.attackNext = []
-
+        if self.auto:
+            self.ship = self.board.allocRandomShip(horizontal)
 
     def go(self,opponentBoard):
+        if self.auto:
+            return self.goAuto(opponentBoard)
+        else:
+            bombedCell = None
+            bombed = False
+            while bombed == False:
+                opponentBoard.printBoard(True)
+                bombedCell = self.getCellToBombFromPlayer(opponentBoard,"Enter the cell to bomb:",'')
+                if bombedCell.hit:
+                    print("You chose an already bombed cell, try again")
+                    continue
+                opponentBoard.bombCell(bombedCell)
+                self.hitMsg(bombedCell)
+                bombed = True
+        return opponentBoard.shipForCellIsSunk(bombedCell)
+
+    def goAuto(self,opponentBoard):
         if self.hitState == 0:
             bombedCell = opponentBoard.bombRandomCell()
             if bombedCell!=None and bombedCell.ship:
@@ -71,3 +89,22 @@ class player:
 
             
     
+    def getCellToBombFromPlayer(self,_board:board,msg:str,unitteststr:str):
+        col = -1
+        row = -1
+        line = ''
+        if unitteststr == '':
+            line = input(self.playername+":"+msg).lower()
+        else:
+            line = unitteststr
+        if len(line) >= 2:
+            try:
+                row = _board.getRowIndex(line[0])
+                col = _board.getColIndex(line[1])
+            except ValueError:
+                print("Invalid cell specification; try again")
+                return self.getCellToBombFromPlayer(_board,msg,unitteststr)
+        else:
+            print("Invalid cell specification; try again")
+            return self.getCellToBombFromPlayer(_board,msg,unitteststr)
+        return _board.getCellFromIndex(row,col)
