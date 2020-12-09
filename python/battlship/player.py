@@ -75,10 +75,14 @@ class player:
                     if opponentBoard.getCellAvail(bombedCell,"south") != None:
                         self.attackNext.append(opponentBoard.getCellAvail(bombedCell,"south"))
                 self.hitMsg(bombedCell)
-        elif self.hitState==2 and len(self.attackNext) > 0:
-            bombedCell = self.attackNext.pop();
+
+        elif self.hitState==2 and len(self.attackNext) > 0:                        
+            bombedCell = self.attackNext.pop()
+            if type(bombedCell) is bool and len(self.attackNext) > 0:
+                bombedCell = self.attackNext.pop()      
+            hit = opponentBoard.bombCell(bombedCell)
             self.hitMsg(bombedCell)
-            if opponentBoard.bombCell(bombedCell):
+            if hit:                
                 return True
         
     def hitMsg(self,attackCell):

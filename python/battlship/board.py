@@ -102,7 +102,9 @@ class board:
         return c
 
     def bombCell(self,_cell:cell):
-        if _cell == None or _cell.hit or self.opencells.count(_cell) != 1:
+        if type(_cell) is bool:
+            print("hold on")
+        if ((_cell == None) or (_cell.hit) or (self.opencells.count(_cell) != 1)):
             raise Exception("Cell is not available")
         _cell.hit = True
         self.opencells.remove(_cell)

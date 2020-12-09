@@ -144,12 +144,14 @@ class TestStringMethods(unittest.TestCase):
 		self.assertIsNotNone(playera.getCellToBombFromPlayer(playera.board,"","4a"))
 
 		#playerb plays on own board ... doesn't matter for testing
-		won = False
-		for i in range(64):
-			won =playerb.go(playerb.board)
-			if won:
-				break
-		self.assertTrue(won)
+		for i in range(10):
+			playerb = player("b",True,silent=True)
+			won = False
+			for i in range(64):
+				won =playerb.go(playerb.board)
+				if won:
+					break
+			self.assertTrue(won)
 
 
 if __name__ == '__main__':
