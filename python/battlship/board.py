@@ -54,20 +54,20 @@ class board:
             playsound(explode)
 
     def getCellAvail(self,_cell,compasDirection:str):
-        if(compasDirection.lower() == "north") and self.rownames.index(_cell.row) > 0:
+        if(compasDirection.lower() == "north") and self.getRowIndex(_cell.row) > 0:
             northCell = self.board[self.rownames.index(_cell.row)-1][self.colnames.index(_cell.col)]
             if northCell.hit != True :
                 return northCell
-        if(compasDirection.lower() == "south") and self.rownames.index(_cell.row) < 7:
+        if(compasDirection.lower() == "south") and self.getRowIndex(_cell.row) < 7:
             southCell = self.board[self.rownames.index(_cell.row)+1][self.colnames.index(_cell.col)]
             if southCell.hit != True :
                 return southCell
             return southCell.hit
-        if(compasDirection.lower() == "east") and self.colnames.index(_cell.col) < 7:
+        if(compasDirection.lower() == "east") and self.getColIndex(_cell.col) < 7:
             eastCell = self.board[self.rownames.index(_cell.row)][self.colnames.index(_cell.col)+1]
             if eastCell.hit != True :
                 return eastCell
-        if(compasDirection.lower() == "west") and self.colnames.index(_cell.col) > 0:
+        if(compasDirection.lower() == "west") and self.getColIndex(_cell.col) > 0:
             westCell = self.board[self.rownames.index(_cell.row)][self.colnames.index(_cell.col)-1]
             if westCell.hit != True :
                 return westCell
@@ -130,7 +130,7 @@ class board:
     #allocate a ship in any cell.  If its on the edge walk it towards the center one cell
     def allocShip(self,horizontal,shipCell:cell):
         col = self.getColIndex(shipCell.col);
-        row = self.getColIndex(shipCell.col);
+        row = self.getRowIndex(shipCell.row);
         if horizontal == True:
             col = self.getColIndex(shipCell.col);
             if col == 0:

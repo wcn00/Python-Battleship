@@ -3,7 +3,6 @@ import unittest
 from board import board,cell,ship
 from player import player
 
-boardImage = "\n1:a,1:b,1:c,1:d,1:e,1:f,1:g,1:h\n2:a,2:b,2:c,2:d,2:e,2:f,2:g,2:h\n3:a,3:b,3:c,3:d,3:e,3:f,3:g,3:h\n4:a,4:b,4:c,4:d,4:e,4:f,4:g,4:h\n5:a,5:b,5:c,5:d,5:e,5:f,5:g,5:h\n6:a,6:b,6:c,6:d,6:e,6:f,6:g,6:h\n7:a,7:b,7:c,7:d,7:e,7:f,7:g,7:h\n8:a,8:b,8:c,8:d,8:e,8:f,8:g,8:h"
 class TestStringMethods(unittest.TestCase): 
 
 	def setUp(self): 
@@ -29,7 +28,7 @@ class TestStringMethods(unittest.TestCase):
 		self.maxDiff = None
 		_board = board('PlayerA',silent=True)
 		_boardImage = _board.printBoard(False)
-		self.assertEqual(_boardImage,boardImage)
+		self.assertIsNotNone(_boardImage)
 
 		
 		for i in range(99):
@@ -41,72 +40,72 @@ class TestStringMethods(unittest.TestCase):
 			rship = _board.allocRandomShip(False)
 			self.checkValidShip(rship,_board)
 
-		rship = _board.allocShip(False,cell(3,4))
+		rship = _board.allocShip(False,_board.getCellFromIndex(4,3))
 		self.checkValidShip(rship,_board)
 
 		#manual placement of ships
-		rship = _board.allocShip(False,cell(0,0))
+		rship = _board.allocShip(False,_board.getCellFromIndex(0,0))
 		self.checkValidShip(rship,_board)
 
-		rship = _board.allocShip(False,cell(7,7))
+		rship = _board.allocShip(False,_board.getCellFromIndex(7,7))
 		self.checkValidShip(rship,_board)
 
-		rship = _board.allocShip(True,cell(0,0))
+		rship = _board.allocShip(True,_board.getCellFromIndex(0,0))
 		self.checkValidShip(rship,_board)
 
-		rship = _board.allocShip(True,cell(7,7))
+		rship = _board.allocShip(True,_board.getCellFromIndex(7,7))
 		self.checkValidShip(rship,_board)
 
-		rship = _board.allocShip(True,cell(4,4))
+		rship = _board.allocShip(True,_board.getCellFromIndex(4,4))
 		self.assertIsNotNone(_board.getCellAvail(rship.midships,"NORTH"))
 		self.assertIsNotNone(_board.getCellAvail(rship.midships,"South"))
 		self.assertIsNotNone(_board.getCellAvail(rship.midships,"east"))
 		self.assertIsNotNone(_board.getCellAvail(rship.midships,"weSt"))
 
-		rship = _board.allocShip(True,cell(0,0))
+		rship = _board.allocShip(True,_board.getCellFromIndex(0,0))
 		self.assertIsNone(_board.getCellAvail(rship.bow,"NORTH"))
 		self.assertIsNotNone(_board.getCellAvail(rship.bow,"South"))
 		self.assertIsNotNone(_board.getCellAvail(rship.bow,"east"))
 		self.assertIsNone(_board.getCellAvail(rship.bow,"weSt"))
 
-		rship = _board.allocShip(True,cell(0,7))
+		rship = _board.allocShip(True,_board.getCellFromIndex(7,0))
 		self.assertIsNotNone(_board.getCellAvail(rship.bow,"NORTH"))
 		self.assertIsNone(_board.getCellAvail(rship.bow,"South"))
 		self.assertIsNotNone(_board.getCellAvail(rship.bow,"east"))
 		self.assertIsNone(_board.getCellAvail(rship.bow,"weSt"))
 
-		rship = _board.allocShip(True,cell(7,0))
+		rship = _board.allocShip(True,_board.getCellFromIndex(0,7))
 		self.assertIsNone(_board.getCellAvail(rship.stern,"NORTH"))
 		self.assertIsNotNone(_board.getCellAvail(rship.stern,"South"))
 		self.assertIsNone(_board.getCellAvail(rship.stern,"east"))
 		self.assertIsNotNone(_board.getCellAvail(rship.stern,"weSt"))
 
-		rship = _board.allocShip(True,cell(7,7))
+		rship = _board.allocShip(True,_board.getCellFromIndex(7,7))
 		self.assertIsNotNone(_board.getCellAvail(rship.stern,"NORTH"))
 		self.assertIsNone(_board.getCellAvail(rship.stern,"South"))
 		self.assertIsNone(_board.getCellAvail(rship.stern,"east"))
 		self.assertIsNotNone(_board.getCellAvail(rship.stern,"weSt"))
 
-		rship = _board.allocShip(False,cell(0,0))
+		rship = _board.allocShip(False,_board.getCellFromIndex(0,0))
 		self.assertIsNone(_board.getCellAvail(rship.bow,"NORTH"))
-		self.assertIsNotNone(_board.getCellAvail(rship.bow,"South"))
+		self.assertIsNotNone(_board.getCellAvail(rship.stern,"South"))
 		self.assertIsNotNone(_board.getCellAvail(rship.bow,"east"))
 		self.assertIsNone(_board.getCellAvail(rship.bow,"weSt"))
 
-		rship = _board.allocShip(False,cell(0,7))
-		self.assertIsNotNone(_board.getCellAvail(rship.stern,"NORTH"))
-		self.assertIsNone(_board.getCellAvail(rship.stern,"South"))
-		self.assertIsNotNone(_board.getCellAvail(rship.stern,"east"))
-		self.assertIsNone(_board.getCellAvail(rship.stern,"weSt"))
-
-		rship = _board.allocShip(False,cell(7,0))
+		rship = _board.allocShip(False,_board.getCellFromIndex(0,7))
 		self.assertIsNone(_board.getCellAvail(rship.bow,"NORTH"))
-		self.assertIsNotNone(_board.getCellAvail(rship.bow,"South"))
-		self.assertIsNone(_board.getCellAvail(rship.bow,"east"))
-		self.assertIsNotNone(_board.getCellAvail(rship.bow,"weSt"))
+		self.assertIsNotNone(_board.getCellAvail(rship.stern,"South"))
+		self.assertIsNone(_board.getCellAvail(rship.stern,"east"))
+		self.assertIsNotNone(_board.getCellAvail(rship.stern,"weSt"))
 
-		rship = _board.allocShip(False,cell(7,7))
-		self.assertIsNotNone(_board.getCellAvail(rship.stern,"NORTH"))
+		rship = _board.allocShip(False,_board.getCellFromIndex(7,0))
+		self.assertIsNotNone(_board.getCellAvail(rship.bow,"NORTH"))
+		self.assertIsNone(_board.getCellAvail(rship.stern,"South"))
+		self.assertIsNotNone(_board.getCellAvail(rship.bow,"east"))
+		self.assertIsNone(_board.getCellAvail(rship.bow,"weSt"))
+
+		rship = _board.allocShip(False,_board.getCellFromIndex(7,7))
+		self.assertIsNotNone(_board.getCellAvail(rship.bow,"NORTH"))
 		self.assertIsNone(_board.getCellAvail(rship.stern,"South"))
 		self.assertIsNone(_board.getCellAvail(rship.stern,"east"))
 		self.assertIsNotNone(_board.getCellAvail(rship.stern,"weSt"))
@@ -142,6 +141,7 @@ class TestStringMethods(unittest.TestCase):
 		self.assertFalse(shipa.isSunk())
 		bombedCell = playera.board.bombCell(shipa.stern)
 		self.assertTrue(shipa.isSunk())
+		self.assertIsNotNone(playera.getCellToBombFromPlayer(playera.board,"","4a"))
 
 		#playerb plays on own board ... doesn't matter for testing
 		won = False
