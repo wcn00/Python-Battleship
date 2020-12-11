@@ -1,20 +1,24 @@
 from board import board
 from player import player
-import os,sys
+import os
+import sys
 import time
+
 
 def getOrientationHorizontal():
     while True:
-        orientation = input("Enter 'H' for Horizontal or 'V' for virticle ship orientation: ")
-        if len(orientation) >0 and orientation.lower()[0] == 'h':
+        orientation = input(
+            "Enter 'H' for Horizontal or 'V' for virticle ship orientation: ")
+        if len(orientation) > 0 and orientation.lower()[0] == 'h':
             return True
             break
-        elif len(orientation) >0 and orientation.lower()[0] == 'v':
+        elif len(orientation) > 0 and orientation.lower()[0] == 'v':
             return False
             break
-    
+
 
 if __name__ == '__main__':
+    """This is the setup and main loop for the game"""
     autoPlay = True
     display = False
     quiet = False
@@ -25,16 +29,17 @@ if __name__ == '__main__':
             quiet = True
         elif arg == '--manual':
             autoPlay = False
-    
-    if autoPlay:
-        playerA = player("Kane",autoPlay)
-    else :
-        playerAName = input("Please enter your name: ")
-        playerA = player(playerAName,autoPlay,quiet)
-        shipCell = playerA.getCellToBombFromPlayer(playerA.board,"Enter the midship cell for your ship: ","")
-        playerA.board.allocShip(getOrientationHorizontal(),shipCell)
 
-    playerB = player("Able",True,quiet)
+    if autoPlay:
+        playerA = player("Kane", autoPlay)
+    else:
+        playerAName = input("Please enter your name: ")
+        playerA = player(playerAName, autoPlay, quiet)
+        shipCell = playerA.getCellToBombFromPlayer(
+            playerA.board, "Enter the midship cell for your ship: ", "")
+        playerA.board.allocShip(getOrientationHorizontal(), shipCell)
+
+    playerB = player("Able", True, quiet)
 
     while True:
         if playerA.go(playerB.board):
