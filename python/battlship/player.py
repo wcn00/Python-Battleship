@@ -14,6 +14,7 @@ class player:
             self.ship = self.board.allocRandomShip(horizontal)
 
     def go(self,opponentBoard):
+        """Player executes a turn.  Used by computer and human players."""
         if self.auto:
             return self.goAuto(opponentBoard)
         else:
@@ -31,6 +32,7 @@ class player:
         return opponentBoard.shipForCellIsSunk(bombedCell)
 
     def goAuto(self,opponentBoard):
+        """Computer players execute a turn. If a hit is achieved, store the status and possibly some bombing targets for the next turn"""
         if self.hitState == 0:
             bombedCell = opponentBoard.bombRandomCell()
             if bombedCell!=None and bombedCell.ship:
@@ -86,6 +88,7 @@ class player:
                 return True
         
     def hitMsg(self,attackCell):
+        """Print an appropriate message at the end of the turn depending on whether a hit was achieved"""
         if attackCell.ship :
             print(self.playername," scored a hit at {}:{}".format(attackCell.col,attackCell.row))
         else:

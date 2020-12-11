@@ -4,6 +4,7 @@ import os
 from playsound import playsound
 #base cell class
 class cell:
+    """Class used to represent a target on the board"""
     def __init__(self,col,row):
         self.row = row
         self.col = col
@@ -12,6 +13,7 @@ class cell:
         self.parentship:ship
 
 class ship():
+    """Class used to represent a ship"""
     def __init__(self,horizontal, bow,midships,stern ):
         self.horizontal = horizontal
         self.bow = bow
@@ -21,10 +23,12 @@ class ship():
         bow.parentship = midships.parentship = stern.parentship = self
     
     def isSunk(self):
+        """Determine if all three cells on the ship are hit, and the ship is sunk"""
         return self.bow.hit and self.midships.hit and self.stern.hit
 
 
 class board:
+    """Class that represents a board.  Each player has a board and they are 8X8 cells in size"""
     def __init__(self,player,silent:bool):
         self.player = player
         self.silent = silent
@@ -42,18 +46,21 @@ class board:
             
 
     def playShoot(self):
+        """Play asound when a shot it taken that misses"""
         if self.silent == False:
             scriptdir = os.path.dirname(os.path.realpath(__file__))
             shoot = scriptdir + "/resources/shoot.mp3"
             playsound(shoot)
 
     def playHit(self):
+        """Play asound when a shot it taken that hits"""
         if self.silent == False:
             scriptdir = os.path.dirname(os.path.realpath(__file__))
             explode = scriptdir + "/resources/explosion.mp3"
             playsound(explode)
 
     def getCellAvail(self,_cell,compasDirection:str):
+        """If the cell in the indicated direction is not already bombed then return it"""
         if(compasDirection.lower() == "north") and self.getRowIndex(_cell.row) > 0:
             northCell = self.board[self.rownames.index(_cell.row)-1][self.colnames.index(_cell.col)]
             if northCell.hit != True :
@@ -74,6 +81,7 @@ class board:
         return None
     
     def printBoard(self,stdout:bool):
+        """Print a representation of theboard in manual lmode to make bombing decisions easier"""
         boardStr = ''
         rowStr = ''
         for r,row in enumerate(self.board):
@@ -92,6 +100,7 @@ class board:
         return boardStr
 
     def bombRandomCell(self):
+        """Bomb a cell at random. This is used by the computer players"""
         if len(self.opencells) ==0:
             raise Exception("No open cells to bomb")
         openCellNum = random.randint(0,len(self.opencells)) -1
@@ -102,6 +111,7 @@ class board:
         return c
 
     def bombCell(self,_cell:cell):
+        """Explicitly bomb a particular cell.  Used by the human playerA in manual mode"""
         if type(_cell) is bool:
             print("hold on")
         if ((_cell == None) or (_cell.hit) or (self.opencells.count(_cell) != 1)):
@@ -115,6 +125,7 @@ class board:
     
 
     def allocRandomShip(self,horizontal):
+        """Place a ship on the grid at random.  Used by the computer players"""
         if horizontal == True: 
             colNo = random.randint(1,6)
             rowNo = random.randint(0,7)
@@ -131,6 +142,7 @@ class board:
 
     #allocate a ship in any cell.  If its on the edge walk it towards the center one cell
     def allocShip(self,horizontal,shipCell:cell):
+        """Place a ship on the grid at specific coordinates.  Used by the human playerA."""
         col = self.getColIndex(shipCell.col);
         row = self.getRowIndex(shipCell.row);
         if horizontal == True:
