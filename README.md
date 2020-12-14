@@ -6,3 +6,5 @@ This is the python solution to the battle ship challenge.  It can be run in seve
 --quiet         Omit the bombint sounds when a hit is scored.
 --curses-display    instead of a scrolling tty display use a curses display where playerA's board is on the left and playerB's board is on the right.
 
+Note that the unittesting coverage for the player module suffered because of adding all the calls to curses based code which can't be tested in unittest.
+
