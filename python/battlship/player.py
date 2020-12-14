@@ -1,18 +1,48 @@
-from board import board
+from board import board,cell
+from display import display
 import random
-
+import time
 
 class player:
-    def __init__(self, playerName, auto: bool, silent=False):
+    def __init__(self,name:str,curses_display:display, silent=False,autoPlay=True,leftPlayer=True):
         horizontal = random.randint(0, 100) % 2 == 1
-        self.playername = playerName
-        self.auto = auto
-        self.board = board(self.playername, silent)
+        self.playername = name
+        self.leftPlayer = leftPlayer
+        self.auto = autoPlay
         self.opponentShip = []
         self.hitState = 0
         self.attackNext = []
-        if self.auto:
+        self.curses_display = curses_display
+        self.shipcell=None
+        if not self.auto:
+            self.playername = self.curses_display.req_reply("Please enter your name: ")
+            orientation = self.curses_display.req_reply("Enter 'H' for Horizontal or 'V' for virticle ship orientation: ")
+            self.horizontal = len(orientation) > 0 and orientation.lower()[0] == 'h'
+            self.board = board(self.playername, silent)
+            while True:
+                shipcellspec = self.curses_display.req_reply("Please enter the cell on which to place your ship: ")
+                if len(shipcellspec)>=2 and shipcellspec[0] in board.rownames and shipcellspec[1].lower() in board.colnames:
+                    self.shipCell = self.board.allocShipByCoorid(horizontal,shipcellspec[0],shipcellspec[1].lower())
+                    break;
+            self.curses_display.settitle(self.playername,self.leftPlayer)
+        else:
+            self.board = board(self.playername, silent)
             self.ship = self.board.allocRandomShip(horizontal)
+            self.curses_display.settitle(self.playername,self.leftPlayer)
+
+    def printboard(self):
+        self.curses_display.printBoard(self.playername,self.board,self.leftPlayer)
+        
+    def printMsg(self,msg:str):
+        self.curses_display.print_status(msg)
+
+    def playerPrint(self,msg:str):
+        self.curses_display.print_status(self.playername+": "+msg)
+        
+    def resetdisplay(self):
+        if self.curses_display.curses_display:
+            self.curses_display.req_reply("Press Enter to exit and reset the screen")
+            self.curses_display.__del__()
 
     def go(self, opponentBoard):
         """Player executes a turn.  Used by computer and human players."""
@@ -22,7 +52,6 @@ class player:
             bombedCell = None
             bombed = False
             while bombed == False:
-                opponentBoard.printBoard(True)
                 bombedCell = self.getCellToBombFromPlayer(
                     opponentBoard, "Enter the cell to bomb:", '')
                 if bombedCell.hit:
@@ -34,6 +63,7 @@ class player:
         return opponentBoard.shipForCellIsSunk(bombedCell)
 
     def goAuto(self, opponentBoard):
+        bombedCell:cell
         """Computer players execute a turn. If a hit is achieved, store the status and possibly some bombing targets for the next turn"""
         if self.hitState == 0:
             bombedCell = opponentBoard.bombRandomCell()
@@ -104,27 +134,27 @@ class player:
     def hitMsg(self, attackCell):
         """Print an appropriate message at the end of the turn depending on whether a hit was achieved"""
         if attackCell.ship:
-            print(self.playername, " scored a hit at {}:{}".format(
-                attackCell.col, attackCell.row))
+            self.playerPrint(" scored a hit at " + attackCell.row+":"+attackCell.col)
         else:
-            print(self.playername, " missed")
+            self.playerPrint(" missed")
+        if self.playername != "unittest":
+            time.sleep(1)
 
-    def getCellToBombFromPlayer(self, _board: board, msg: str, unitteststr: str):
+    def getCellToBombFromPlayer(self, opponentboard: board, msg: str, unitteststr: str):
         col = -1
         row = -1
-        line = ''
-        if unitteststr == '':
-            line = input(self.playername+":"+msg).lower()
-        else:
+        shipcell:cell
+        line:str
+        if unitteststr != '':
             line = unitteststr
-        if len(line) >= 2:
-            try:
-                row = _board.getRowIndex(line[0])
-                col = _board.getColIndex(line[1])
-            except ValueError:
-                print("Invalid cell specification; try again")
-                return self.getCellToBombFromPlayer(_board, msg, unitteststr)
         else:
-            print("Invalid cell specification; try again")
-            return self.getCellToBombFromPlayer(_board, msg, unitteststr)
-        return _board.getCellFromIndex(row, col)
+            line = self.curses_display.req_reply(self.playername+":"+msg)
+        if len(line)>= 2 and line[0] in board.rownames and line[1].lower() in board.colnames:
+            return opponentboard.getCellFromIndex(self.board.getRowIndex(line[0]),self.board.getColIndex(line[1].lower()))
+        else:
+            self.printMsg("Invalid cell specification; try again")
+            return self.getCellToBombFromPlayer(opponentboard, msg, unitteststr)
+
+
+    def setName(self,name:str):
+        self.playername =name

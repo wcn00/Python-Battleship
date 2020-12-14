@@ -1,52 +1,49 @@
 from board import board
 from player import player
+from display import display
 import os
 import sys
 import time
 
-
-def getOrientationHorizontal():
-    while True:
-        orientation = input(
-            "Enter 'H' for Horizontal or 'V' for virticle ship orientation: ")
-        if len(orientation) > 0 and orientation.lower()[0] == 'h':
-            return True
-            break
-        elif len(orientation) > 0 and orientation.lower()[0] == 'v':
-            return False
-            break
+def usage():
+    print("Usage:  python game.py <option>")
+    print("options:")
+    print("--quiet           do not bombing and sooting sounds")
+    print("--manual          allow player A to choose their own bombing sites")
+    print("--curses-display  display the boards via curses")
 
 
 if __name__ == '__main__':
     """This is the setup and main loop for the game"""
     autoPlay = True
-    display = False
     quiet = False
     playerA = None
-    PlayerB = None
+    playerB = None
+    curses_display = False
     for arg in sys.argv[1:]:
         if arg == '--quiet':
             quiet = True
         elif arg == '--manual':
             autoPlay = False
-
-    if autoPlay:
-        playerA = player("Kane", autoPlay)
-    else:
-        playerAName = input("Please enter your name: ")
-        playerA = player(playerAName, autoPlay, quiet)
-        shipCell = playerA.getCellToBombFromPlayer(
-            playerA.board, "Enter the midship cell for your ship: ", "")
-        playerA.board.allocShip(getOrientationHorizontal(), shipCell)
-
-    playerB = player("Able", True, quiet)
-
+        elif arg == '--curses-display':
+            curses_display = True
+        elif arg == '-h' or arg == '--help':
+            usage()
+    curses_display = display(curses_display)
+    playerA = player("Kane", curses_display,quiet,autoPlay,leftPlayer = True)
+    playerB = player("Able", curses_display,quiet,True,leftPlayer = False)
     while True:
+        playerA.printboard()
+        playerB.printboard()
+
         if playerA.go(playerB.board):
-            print(playerB.playername + ": you sank my battleship!")
+            playerA.printboard()
+            playerB.printboard()
+            playerB.playerPrint("you sank my battleship!")
             break
         if playerB.go(playerA.board):
-            print(playerA.playername + ": you sank my battleship!")
+            playerA.printboard()
+            playerB.printboard()
+            playerA.playerPrint("you sank my battleship!")
             break
-        time.sleep(.2)
-    print("\nGame Over\n")
+    playerA.resetdisplay()

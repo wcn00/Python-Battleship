@@ -2,6 +2,7 @@
 import unittest
 from board import board, cell, ship
 from player import player
+from display import display
 
 
 class TestStringMethods(unittest.TestCase):
@@ -27,8 +28,6 @@ class TestStringMethods(unittest.TestCase):
     def test_boardfunctions(self):
         self.maxDiff = None
         _board = board('PlayerA', silent=True)
-        _boardImage = _board.printBoard(False)
-        self.assertIsNotNone(_boardImage)
 
         for i in range(99):
             # horizontal alignment
@@ -128,8 +127,9 @@ class TestStringMethods(unittest.TestCase):
         self.assertRaises(Exception,  _board.bombRandomCell, None)
 
     def test_playerfunctions(self):
-        playera = player("a", True, silent=True)
-        playerb = player("b", True, silent=True)
+        curses_display = display(False)
+        playera = player("unittest", curses_display,silent=True,autoPlay=True,leftPlayer=True)
+        playerb = player("unittest", curses_display,silent=True,autoPlay=True,leftPlayer=False)
         shipa = playera.ship
         shipb = playerb.ship
         self.assertFalse(shipa.isSunk())
@@ -141,16 +141,38 @@ class TestStringMethods(unittest.TestCase):
         self.assertTrue(shipa.isSunk())
         self.assertIsNotNone(
             playera.getCellToBombFromPlayer(playera.board, "", "4a"))
+        try:
+            playerb.printboard()
+            playerb.printMsg("mary had a little lamb")
+            playerb.playerPrint("mary had a little lamb")
+            playerb.setName("walter")
+            shipb  = playerb.board.allocShipByCoorid(True,'4','b')
+            self.assertIsNotNone(shipb)
+        except:
+            self.assertTrue(False)
 
         # playerb plays on own board ... doesn't matter for testing
         for i in range(10):
-            playerb = player("b", True, silent=True)
+            playerb = player("unittest", curses_display,silent=True,autoPlay=True,leftPlayer=False)
             won = False
             for i in range(64):
                 won = playerb.go(playerb.board)
                 if won:
                     break
             self.assertTrue(won)
+
+    def test_displayfunctions(self):
+        curses_display = display(False)
+        _board = board('unittest', silent=True)
+        self.assertIsNotNone(curses_display)
+        try:
+            curses_display.printBoard("unittest",_board,True)
+            curses_display.print_status("mary had a little lamb")
+        except Exception:            
+            self.assertTrue(False)
+
+        
+        curses_display.__del__()
 
 
 if __name__ == '__main__':

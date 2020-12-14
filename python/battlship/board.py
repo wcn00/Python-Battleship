@@ -14,13 +14,23 @@ class cell:
         self.ship = False
         self.hit = False
         self.parentship: ship
+    
+
+    def printCell(self):
+        rowStr = ''
+        if self.ship and self.hit:
+            rowStr += "** "
+        elif self.hit:
+            rowStr += "XX "
+        else:
+            rowStr += self.row+self.col+' '
+        return rowStr
 
 
 class ship():
     """Class used to represent a ship"""
 
-    def __init__(self, horizontal, bow, midships, stern):
-        self.horizontal = horizontal
+    def __init__(self, bow, midships, stern):
         self.bow = bow
         self.midships = midships
         self.stern = stern
@@ -33,13 +43,13 @@ class ship():
 
 
 class board:
-    """Class that represents a board.  Each player has a board and they are 8X8 cells in size"""
+    colnames = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
+    rownames = ('1', '2', '3', '4', '5', '6', '7', '8')
 
+    """Class that represents a board.  Each player has a board and they are 8X8 cells in size"""
     def __init__(self, player, silent: bool):
         self.player = player
         self.silent = silent
-        self.colnames = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h')
-        self.rownames = ('1', '2', '3', '4', '5', '6', '7', '8')
         self.board = []
         self.opencells = []
         for r, row in enumerate(self.rownames):
@@ -89,24 +99,17 @@ class board:
                 return westCell
         return None
 
-    def printBoard(self, stdout: bool):
-        """Print a representation of theboard in manual lmode to make bombing decisions easier"""
-        boardStr = ''
-        rowStr = ''
-        for r, row in enumerate(self.board):
-            for c, cell in enumerate(row):
-                if cell.ship and cell.hit:
-                    rowStr += "** "
-                elif cell.hit:
-                    rowStr += "XX "
-                else:
-                    rowStr += cell.row+cell.col+' '
-            rowStr = rowStr[:-1]
-            if(stdout):
-                print(rowStr)
-            boardStr += '\n' + rowStr
-            rowStr = ''
-        return boardStr
+    # def printBoard(self):
+    #     """Return an array of strings representing the board"""
+    #     boardStr = []
+    #     rowStr = ''
+    #     for r, row in enumerate(self.board):
+    #         for c, cell in enumerate(row):
+    #             rowStr += cell.print();
+    #         boardStr += rowStr
+    #         rowStr = ''
+    #     return boardStr
+
 
     def bombRandomCell(self):
         """Bomb a cell at random. This is used by the computer players"""
@@ -121,8 +124,6 @@ class board:
 
     def bombCell(self, _cell: cell):
         """Explicitly bomb a particular cell.  Used by the human playerA in manual mode"""
-        if type(_cell) is bool:
-            print("hold on")
         if ((_cell == None) or (_cell.hit) or (self.opencells.count(_cell) != 1)):
             raise Exception("Cell is not available")
         _cell.hit = True
@@ -146,7 +147,11 @@ class board:
             bowCell = self.board[rowNo][colNo]
             midCell = self.board[rowNo+1][colNo]
             sternCell = self.board[rowNo-1][colNo]
-        return ship(horizontal, bowCell, midCell, sternCell)
+        return ship(bowCell, midCell, sternCell)
+
+    def allocShipByCoorid(self, horizontal, row:str,col:str):
+        shipCell:cell =  self.getCellFromIndex(self.getRowIndex(row),self.getColIndex(col))
+        return self.allocShip(horizontal,shipCell)
 
     # allocate a ship in any cell.  If its on the edge walk it towards the center one cell
     def allocShip(self, horizontal, shipCell: cell):
@@ -170,13 +175,13 @@ class board:
             midCell = self.board[row][col]
             bowCell = self.board[row-1][col]
             sternCell = self.board[row+1][col]
-        return ship(horizontal, bowCell, midCell, sternCell)
+        return ship(bowCell, midCell, sternCell)
 
     def getColIndex(self, colLbl: str):
-        return self.colnames.index(colLbl)
+        return board.colnames.index(colLbl)
 
     def getRowIndex(self, rowLbl: str):
-        return self.rownames.index(rowLbl)
+        return board.rownames.index(rowLbl)
 
     def getCellFromIndex(self, row, col):
         return self.board[row][col]
