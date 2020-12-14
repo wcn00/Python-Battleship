@@ -43,7 +43,7 @@ class display:
             curses.resetty()
             curses.endwin()
 
-    def printBoard(self,playername:str,bd:board,leftPlayer:bool):
+    def display_board(self,playername:str,bd:board,leftPlayer:bool):
         if not self.curses_display:
             self._printtty(playername,bd)
             return
@@ -54,7 +54,7 @@ class display:
         for row in bd.board:
             boardrow=''
             for cell in row:
-                boardrow +=cell.printCell()
+                boardrow +=cell.print_cell()
             if leftPlayer:
                 self.displayA.addstr(boardrow)
                 self.displayA.refresh()
@@ -79,7 +79,7 @@ class display:
         for row in bd.board:
             boardrow=''
             for cell in row:
-                boardrow +=cell.printCell()
+                boardrow +=cell.print_cell()
             print(boardrow)
         print("\n")
             

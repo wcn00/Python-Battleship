@@ -33,17 +33,17 @@ if __name__ == '__main__':
     playerA = player("Kane", curses_display,quiet,autoPlay,leftPlayer = True)
     playerB = player("Able", curses_display,quiet,True,leftPlayer = False)
     while True:
-        playerA.printboard()
-        playerB.printboard()
+        playerA.print_board()
+        playerB.print_board()
 
         if playerA.go(playerB.board):
-            playerA.printboard()
-            playerB.printboard()
-            playerB.playerPrint("you sank my battleship!")
+            playerA.print_board()
+            playerB.print_board()
+            playerB.player_print("you sank my battleship!")
             break
         if playerB.go(playerA.board):
-            playerA.printboard()
-            playerB.printboard()
-            playerA.playerPrint("you sank my battleship!")
+            playerA.print_board()
+            playerB.print_board()
+            playerA.player_print("you sank my battleship!")
             break
     playerA.resetdisplay()

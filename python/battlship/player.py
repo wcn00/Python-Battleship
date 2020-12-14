@@ -22,25 +22,26 @@ class player:
             while True:
                 shipcellspec = self.curses_display.req_reply("Please enter the cell on which to place your ship: ")
                 if len(shipcellspec)>=2 and shipcellspec[0] in board.rownames and shipcellspec[1].lower() in board.colnames:
-                    self.shipCell = self.board.allocShipByCoorid(horizontal,shipcellspec[0],shipcellspec[1].lower())
+                    self.shipCell = self.board.alloc_ship_by_coorid(horizontal,shipcellspec[0],shipcellspec[1].lower())
                     break;
             self.curses_display.settitle(self.playername,self.leftPlayer)
         else:
             self.board = board(self.playername, silent)
-            self.ship = self.board.allocRandomShip(horizontal)
+            self.ship = self.board.alloc_random_ship(horizontal)
             self.curses_display.settitle(self.playername,self.leftPlayer)
 
-    def printboard(self):
-        self.curses_display.printBoard(self.playername,self.board,self.leftPlayer)
+    def print_board(self):
+        self.curses_display.display_board(self.playername,self.board,self.leftPlayer)
         
-    def printMsg(self,msg:str):
+    def print_msg(self,msg:str):
         self.curses_display.print_status(msg)
 
-    def playerPrint(self,msg:str):
+    def player_print(self,msg:str):
         self.curses_display.print_status(self.playername+": "+msg)
         
     def resetdisplay(self):
         if self.curses_display.curses_display:
+            time.sleep(5)
             self.curses_display.req_reply("Press Enter to exit and reset the screen")
             self.curses_display.__del__()
 
@@ -52,95 +53,95 @@ class player:
             bombedCell = None
             bombed = False
             while bombed == False:
-                bombedCell = self.getCellToBombFromPlayer(
+                bombedCell = self.get_cell_to_bomb_from_player(
                     opponentBoard, "Enter the cell to bomb:", '')
                 if bombedCell.hit:
                     print("You chose an already bombed cell, try again")
                     continue
-                opponentBoard.bombCell(bombedCell)
-                self.hitMsg(bombedCell)
+                opponentBoard.bomb_cell(bombedCell)
+                self.hit_msg(bombedCell)
                 bombed = True
-        return opponentBoard.shipForCellIsSunk(bombedCell)
+        return opponentBoard.ship_for_cell_is_sunk(bombedCell)
 
     def goAuto(self, opponentBoard):
         bombedCell:cell
         """Computer players execute a turn. If a hit is achieved, store the status and possibly some bombing targets for the next turn"""
         if self.hitState == 0:
-            bombedCell = opponentBoard.bombRandomCell()
+            bombedCell = opponentBoard.bomb_random_cell()
             if bombedCell != None and bombedCell.ship:
                 self.hitState = 1
                 self.opponentShip.append(bombedCell)
-            self.hitMsg(bombedCell)
+            self.hit_msg(bombedCell)
 
         elif self.hitState == 1:
-            if opponentBoard.getCellAvail(self.opponentShip[0], "east"):
-                bombedCell = opponentBoard.getCellAvail(
+            if opponentBoard.get_cell_avail(self.opponentShip[0], "east"):
+                bombedCell = opponentBoard.get_cell_avail(
                     self.opponentShip[0], "east")
-                if bombedCell != None and opponentBoard.bombCell(bombedCell):
+                if bombedCell != None and opponentBoard.bomb_cell(bombedCell):
                     self.hitState = 2
                     self.opponentShip.append(bombedCell)
-                    if opponentBoard.getCellAvail(bombedCell, "east") != None:
+                    if opponentBoard.get_cell_avail(bombedCell, "east") != None:
                         self.attackNext.append(
-                            opponentBoard.getCellAvail(bombedCell, "east"))
-                    if opponentBoard.getCellAvail(self.opponentShip[0], "west") != None:
-                        self.attackNext.append(opponentBoard.getCellAvail(
+                            opponentBoard.get_cell_avail(bombedCell, "east"))
+                    if opponentBoard.get_cell_avail(self.opponentShip[0], "west") != None:
+                        self.attackNext.append(opponentBoard.get_cell_avail(
                             self.opponentShip[0], "west"))
-                self.hitMsg(bombedCell)
-            elif opponentBoard.getCellAvail(self.opponentShip[0], "north"):
-                bombedCell = opponentBoard.getCellAvail(
+                self.hit_msg(bombedCell)
+            elif opponentBoard.get_cell_avail(self.opponentShip[0], "north"):
+                bombedCell = opponentBoard.get_cell_avail(
                     self.opponentShip[0], "north")
-                if bombedCell != None and opponentBoard.bombCell(bombedCell):
+                if bombedCell != None and opponentBoard.bomb_cell(bombedCell):
                     self.hitState = 2
                     self.opponentShip.append(bombedCell)
-                    if opponentBoard.getCellAvail(bombedCell, "north") != None:
+                    if opponentBoard.get_cell_avail(bombedCell, "north") != None:
                         self.attackNext.append(
-                            opponentBoard.getCellAvail(bombedCell, "north"))
-                    if opponentBoard.getCellAvail(self.opponentShip[0], "south") != None:
-                        self.attackNext.append(opponentBoard.getCellAvail(
+                            opponentBoard.get_cell_avail(bombedCell, "north"))
+                    if opponentBoard.get_cell_avail(self.opponentShip[0], "south") != None:
+                        self.attackNext.append(opponentBoard.get_cell_avail(
                             self.opponentShip[0], "south"))
-                self.hitMsg(bombedCell)
+                self.hit_msg(bombedCell)
             # cell to east was already bombed and missed
-            elif opponentBoard.getCellAvail(self.opponentShip[0], "west"):
-                bombedCell = opponentBoard.getCellAvail(
+            elif opponentBoard.get_cell_avail(self.opponentShip[0], "west"):
+                bombedCell = opponentBoard.get_cell_avail(
                     self.opponentShip[0], "west")
-                if bombedCell != None and opponentBoard.bombCell(bombedCell):
+                if bombedCell != None and opponentBoard.bomb_cell(bombedCell):
                     self.hitState = 2
                     self.opponentShip.append(bombedCell)
-                    if opponentBoard.getCellAvail(bombedCell, "west") != None:
+                    if opponentBoard.get_cell_avail(bombedCell, "west") != None:
                         self.attackNext.append(
-                            opponentBoard.getCellAvail(bombedCell, "west"))
-                self.hitMsg(bombedCell)
+                            opponentBoard.get_cell_avail(bombedCell, "west"))
+                self.hit_msg(bombedCell)
             # cell to north was already bombed and missed
-            elif opponentBoard.getCellAvail(self.opponentShip[0], "south"):
-                bombedCell = opponentBoard.getCellAvail(
+            elif opponentBoard.get_cell_avail(self.opponentShip[0], "south"):
+                bombedCell = opponentBoard.get_cell_avail(
                     self.opponentShip[0], "south")
-                if bombedCell != None and opponentBoard.bombCell(bombedCell):
+                if bombedCell != None and opponentBoard.bomb_cell(bombedCell):
                     self.hitState = 2
                     self.opponentShip.append(bombedCell)
-                    if opponentBoard.getCellAvail(bombedCell, "south") != None:
+                    if opponentBoard.get_cell_avail(bombedCell, "south") != None:
                         self.attackNext.append(
-                            opponentBoard.getCellAvail(bombedCell, "south"))
-                self.hitMsg(bombedCell)
+                            opponentBoard.get_cell_avail(bombedCell, "south"))
+                self.hit_msg(bombedCell)
 
         elif self.hitState == 2 and len(self.attackNext) > 0:
             bombedCell = self.attackNext.pop()
             if type(bombedCell) is bool and len(self.attackNext) > 0:
                 bombedCell = self.attackNext.pop()
-            hit = opponentBoard.bombCell(bombedCell)
-            self.hitMsg(bombedCell)
+            hit = opponentBoard.bomb_cell(bombedCell)
+            self.hit_msg(bombedCell)
             if hit:
                 return True
 
-    def hitMsg(self, attackCell):
+    def hit_msg(self, attackCell):
         """Print an appropriate message at the end of the turn depending on whether a hit was achieved"""
         if attackCell.ship:
-            self.playerPrint(" scored a hit at " + attackCell.row+":"+attackCell.col)
+            self.player_print(" scored a hit at " + attackCell.row+":"+attackCell.col)
         else:
-            self.playerPrint(" missed")
+            self.player_print(" missed")
         if self.playername != "unittest":
             time.sleep(1)
 
-    def getCellToBombFromPlayer(self, opponentboard: board, msg: str, unitteststr: str):
+    def get_cell_to_bomb_from_player(self, opponentboard: board, msg: str, unitteststr: str):
         col = -1
         row = -1
         shipcell:cell
@@ -150,11 +151,11 @@ class player:
         else:
             line = self.curses_display.req_reply(self.playername+":"+msg)
         if len(line)>= 2 and line[0] in board.rownames and line[1].lower() in board.colnames:
-            return opponentboard.getCellFromIndex(self.board.getRowIndex(line[0]),self.board.getColIndex(line[1].lower()))
+            return opponentboard.get_cell_from_index(self.board.get_row_index(line[0]),self.board.get_col_index(line[1].lower()))
         else:
-            self.printMsg("Invalid cell specification; try again")
-            return self.getCellToBombFromPlayer(opponentboard, msg, unitteststr)
+            self.print_msg("Invalid cell specification; try again")
+            return self.get_cell_to_bomb_from_player(opponentboard, msg, unitteststr)
 
 
-    def setName(self,name:str):
+    def set_name(self,name:str):
         self.playername =name

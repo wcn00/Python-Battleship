@@ -16,7 +16,7 @@ class cell:
         self.parentship: ship
     
 
-    def printCell(self):
+    def print_cell(self):
         rowStr = ''
         if self.ship and self.hit:
             rowStr += "** "
@@ -60,58 +60,47 @@ class board:
                 self.opencells.append(_cell)
             self.board.append(_row)
 
-    def playShoot(self):
+    def play_Shoot(self):
         """Play asound when a shot it taken that misses"""
         if self.silent == False:
             scriptdir = os.path.dirname(os.path.realpath(__file__))
             shoot = scriptdir + "/resources/shoot.mp3"
             playsound(shoot)
 
-    def playHit(self):
+    def play_hit(self):
         """Play asound when a shot it taken that hits"""
         if self.silent == False:
             scriptdir = os.path.dirname(os.path.realpath(__file__))
             explode = scriptdir + "/resources/explosion.mp3"
             playsound(explode)
 
-    def getCellAvail(self, _cell, compasDirection: str):
+    def get_cell_avail(self, _cell, compasDirection: str):
         """If the cell in the indicated direction is not already bombed then return it"""
-        if(compasDirection.lower() == "north") and self.getRowIndex(_cell.row) > 0:
+        if(compasDirection.lower() == "north") and self.get_row_index(_cell.row) > 0:
             northCell = self.board[self.rownames.index(
                 _cell.row)-1][self.colnames.index(_cell.col)]
             if northCell.hit != True:
                 return northCell
-        if(compasDirection.lower() == "south") and self.getRowIndex(_cell.row) < 7:
+        if(compasDirection.lower() == "south") and self.get_row_index(_cell.row) < 7:
             southCell = self.board[self.rownames.index(
                 _cell.row)+1][self.colnames.index(_cell.col)]
             if southCell.hit != True:
                 return southCell
             return southCell.hit
-        if(compasDirection.lower() == "east") and self.getColIndex(_cell.col) < 7:
+        if(compasDirection.lower() == "east") and self.get_col_index(_cell.col) < 7:
             eastCell = self.board[self.rownames.index(
                 _cell.row)][self.colnames.index(_cell.col)+1]
             if eastCell.hit != True:
                 return eastCell
-        if(compasDirection.lower() == "west") and self.getColIndex(_cell.col) > 0:
+        if(compasDirection.lower() == "west") and self.get_col_index(_cell.col) > 0:
             westCell = self.board[self.rownames.index(
                 _cell.row)][self.colnames.index(_cell.col)-1]
             if westCell.hit != True:
                 return westCell
         return None
 
-    # def printBoard(self):
-    #     """Return an array of strings representing the board"""
-    #     boardStr = []
-    #     rowStr = ''
-    #     for r, row in enumerate(self.board):
-    #         for c, cell in enumerate(row):
-    #             rowStr += cell.print();
-    #         boardStr += rowStr
-    #         rowStr = ''
-    #     return boardStr
 
-
-    def bombRandomCell(self):
+    def bomb_random_cell(self):
         """Bomb a cell at random. This is used by the computer players"""
         if len(self.opencells) == 0:
             raise Exception("No open cells to bomb")
@@ -119,21 +108,21 @@ class board:
         c = self.opencells.pop(openCellNum)
         c.hit = True
         if c.ship:
-            self.playHit()
+            self.play_hit()
         return c
 
-    def bombCell(self, _cell: cell):
+    def bomb_cell(self, _cell: cell):
         """Explicitly bomb a particular cell.  Used by the human playerA in manual mode"""
         if ((_cell == None) or (_cell.hit) or (self.opencells.count(_cell) != 1)):
             raise Exception("Cell is not available")
         _cell.hit = True
         self.opencells.remove(_cell)
         if _cell.ship:
-            self.playHit()
+            self.play_hit()
             return True
         return False
 
-    def allocRandomShip(self, horizontal):
+    def alloc_random_ship(self, horizontal):
         """Place a ship on the grid at random.  Used by the computer players"""
         if horizontal == True:
             colNo = random.randint(1, 6)
@@ -149,17 +138,17 @@ class board:
             sternCell = self.board[rowNo-1][colNo]
         return ship(bowCell, midCell, sternCell)
 
-    def allocShipByCoorid(self, horizontal, row:str,col:str):
-        shipCell:cell =  self.getCellFromIndex(self.getRowIndex(row),self.getColIndex(col))
-        return self.allocShip(horizontal,shipCell)
+    def alloc_ship_by_coorid(self, horizontal, row:str,col:str):
+        shipCell:cell =  self.get_cell_from_index(self.get_row_index(row),self.get_col_index(col))
+        return self.alloc_ship(horizontal,shipCell)
 
     # allocate a ship in any cell.  If its on the edge walk it towards the center one cell
-    def allocShip(self, horizontal, shipCell: cell):
+    def alloc_ship(self, horizontal, shipCell: cell):
         """Place a ship on the grid at specific coordinates.  Used by the human playerA."""
-        col = self.getColIndex(shipCell.col)
-        row = self.getRowIndex(shipCell.row)
+        col = self.get_col_index(shipCell.col)
+        row = self.get_row_index(shipCell.row)
         if horizontal == True:
-            col = self.getColIndex(shipCell.col)
+            col = self.get_col_index(shipCell.col)
             if col == 0:
                 col = col+1
             if col == 7:
@@ -177,14 +166,14 @@ class board:
             sternCell = self.board[row+1][col]
         return ship(bowCell, midCell, sternCell)
 
-    def getColIndex(self, colLbl: str):
+    def get_col_index(self, colLbl: str):
         return board.colnames.index(colLbl)
 
-    def getRowIndex(self, rowLbl: str):
+    def get_row_index(self, rowLbl: str):
         return board.rownames.index(rowLbl)
 
-    def getCellFromIndex(self, row, col):
+    def get_cell_from_index(self, row, col):
         return self.board[row][col]
 
-    def shipForCellIsSunk(self, _cell: cell):
+    def ship_for_cell_is_sunk(self, _cell: cell):
         return (_cell.ship and _cell.parentship.isSunk())
